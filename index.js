@@ -1,5 +1,4 @@
-/*Author - Jayant Navrange
-Cheerio to scrape,Nodejs backend runtime env,Express js framework for backend,Axios for http request/response*/
+//Author - Jayant Navrange
 
 const PORT = process.env.PORT || 8000
 const express = require('express')
@@ -7,8 +6,8 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const app = express()
 
-//Some host/os needs this to work
-app.set('port', (process.env.PORT || 5000));
+//Some host/os needs below lines to work
+app.set('port', PORT);
 app.use(express.static(__dirname + '/public'));
 
 //Results
@@ -21,6 +20,7 @@ let frr = []
 
 //Msg
 var type = 'not available'
+var info = '-> Attention sometimes you may get outdated data,lookout <-'
 
 //Get word of the day from all sources
 app.get('/word/today', (req, resp) => {
@@ -29,7 +29,7 @@ app.get('/word/today', (req, resp) => {
       const html = response.data
       const $ = cheerio.load(html)
 
-      const source = 'dictionary.com'
+      const source = '#1'
       const date = $('.otd-item-headword__date').children().first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
       const word = $('.otd-item-headword__word').children().first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
       const mean = $('.otd-item-headword__pos-blocks p:nth-child(2)').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
@@ -41,7 +41,7 @@ app.get('/word/today', (req, resp) => {
       const html = response.data
       const $ = cheerio.load(html)
 
-      const source = 'merriam-webster.com'
+      const source = '#2'
       const date = $('.w-a-title').text().split(':')[1].trim()
       const word = $('.word-and-pronunciation h1').text().replace(/(\r\n|\n|\r)/gm, "").trim()
       const type = $('.word-attributes .main-attr').text().trim()
@@ -49,16 +49,16 @@ app.get('/word/today', (req, resp) => {
       mw = []
       mw.push({ source, date, word, type, mean })
     })
-  const s3 = axios.get('https://www.collinsdictionary.com/word-of-the-day')
+  const s3 = axios.get('https://www.shabdkosh.com/word-of-the-day/hindi-english')
     .then(function (response) {
       const html = response.data
       const $ = cheerio.load(html)
 
-      const source = 'collinsdictionary.com'
-      const mmean = $('.pB-d').text().split('!')[1].trim()
-      const date = $('.pB-c .date').children().first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
-      const word = $('.pB-t').children('.h1').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
-      const mean = mmean.split('\n')[0]
+      const source = '#3'
+      const mmean = $('.border .pt-3').remove().text()//remove pt-3 selector
+      const mean = $('.border').children('p').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
+      const date = $('p').children('time').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
+      const word = $('.pt-3').children('a').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
       cd = []
       cd.push({ source, date, word, type, mean })
     })
@@ -67,7 +67,7 @@ app.get('/word/today', (req, resp) => {
       const html = response.data
       const $ = cheerio.load(html)
 
-      const source = 'pendulumedu.com'
+      const source = '#4'
       const date = $('.pronounce').text().replace(/(\r\n|\n|\r)/gm, "").trim()
       const word = $('.wotd-left h2').text().replace(/(\r\n|\n|\r)/gm, "").trim()
       const type = $('.wotd-right small').text().toLowerCase().trim()
@@ -80,7 +80,7 @@ app.get('/word/today', (req, resp) => {
       const html = response.data
       const $ = cheerio.load(html)
 
-      const source = 'learnersdictionary.com'
+      const source = '#5'
       const date = $('.for_date').text().replace(/(\r\n|\n|\r)/gm, "").trim()
       const word = $('.hw_m .hw_txt').text().replace(/(\r\n|\n|\r)/gm, "").trim()
       const type = $('.hw_d span:nth-child(4)').text().trim()
@@ -91,12 +91,12 @@ app.get('/word/today', (req, resp) => {
 
   Promise.allSettled([s1, s2, s3, s4, s5]).then(values => {
     frr = []
-    frr = [].concat(dc, mw, cd, pm, ld)
+    infomsg = []
+    infomsg.push({ info })
+    frr = [].concat(info, dc, mw, cd, pm, ld)
     resp.status(200).json(frr)
 
-  }).catch(function (err) {
-    console.log(err);
-  })
+  }).catch(err => resp.json(err.message))
 })
 
 //Get all words from Dictionary.com
@@ -120,7 +120,7 @@ app.get('/word/dc/recent', (req, resp) => {
       })
 
       resp.json(finalres)
-    })
+    }).catch(err => resp.json(err.message))
 
 })
 
@@ -137,14 +137,14 @@ app.get('/word/dc', (req, resp) => {
       const word = $('.otd-item-headword__word').children().first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
       const mean = $('.otd-item-headword__pos-blocks p:nth-child(2)').first().text().replace(/\r?\n?/g, '').trim()
       arr.push({
+        info,
         date,
         word,
         type,
         mean
       })
       resp.json(arr)
-
-    })
+    }).catch(err => resp.json(err.message))
 
 })
 
@@ -161,36 +161,38 @@ app.get('/word/mw', (req, resp) => {
       const mean = $('.wod-definition-container p').text().replace(/\..*$/, '.').trim()
       const type = $('.word-attributes .main-attr').text().trim()
       arr.push({
+        info,
         date,
         word,
         type,
         mean
       })
       resp.json(arr)
-    })
+    }).catch(err => resp.json(err.message))
 
 })
 
-//Get wotd from Collins Dictionary
+//Get wotd from Shabdkosh Dictionary
 app.get('/word/cd', (req, resp) => {
-  axios.get('https://www.collinsdictionary.com/word-of-the-day')
+  axios.get('https://www.shabdkosh.com/word-of-the-day/hindi-english')
     .then((response) => {
       const html = response.data
       const $ = cheerio.load(html)
       const arr = []
 
-      const mmean = $('.pB-d').text().split('!')[1].trim()
-      const date = $('.pB-c .date').children().first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
-      const word = $('.pB-t').children('.h1').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
-      const mean = mmean.split('\n')[0]
+      const mmean = $('.border .pt-3').remove().text()//remove pt-3 selector
+      const mean = $('.border').children('p').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
+      const date = $('p').children('time').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
+      const word = $('.pt-3').children('a').first().text().replace(/(\r\n|\n|\r)/gm, "").trim()
       arr.push({
+        info,
         date,
         word,
         type,
         mean
       })
       resp.json(arr)
-    })
+    }).catch(err => resp.json(err.message))
 
 })
 
@@ -209,14 +211,14 @@ app.get('/word/pm', (req, resp) => {
       const mean = m1.split('-')[0]
       const type = $('.wotd-right small').text().toLowerCase().trim()
       arr.push({
+        info,
         date,
         word,
         type,
         mean
       })
-
       resp.json(arr)
-    })
+    }).catch(err => resp.json(err.message))
 
 })
 
@@ -234,18 +236,18 @@ app.get('/word/ld', (req, resp) => {
       const mean = $('.midbt p').text().trim()
 
       arr.push({
+        info,
         date,
         word,
         type,
         mean
       })
-
       resp.json(arr)
-    })
+    }).catch(err => resp.json(err.message))
 
 })
 
-app.get('/',(req,res) => {
+app.get('/', (req, res) => {
   res.json('Welcome,read the guide to use the api..')
 })
 
