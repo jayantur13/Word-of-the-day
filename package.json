@@ -1,7 +1,7 @@
 {
   "name": "wordapi",
   "version": "1.0.0",
-  "description": "Get word of the day from single or multiple sources",
+  "description": "Get word of the day from single or multiple sources easily",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
