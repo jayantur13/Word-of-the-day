@@ -1,13 +1,13 @@
 {
   "name": "wordapi",
   "version": "1.0.0",
-  "description": "",
+  "description": "Get word of the day from single or multiple sources",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
   },
   "author": "Jayant Navrange",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.24.0",
     "cheerio": "^1.0.0-rc.10",
