@@ -11,6 +11,9 @@ To run the project,type in terminal<br />
 
 `npm start`
 
+## Sponsor
+If this project helped you in any way,you can always sponsor to support me and the project
+
 ## Reminder
 Most of the websites have don't want to be scrapped.So, try not to flood the website with many requests and use this only for personal projects 
 
