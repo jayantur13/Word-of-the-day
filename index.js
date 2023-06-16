@@ -1,14 +1,10 @@
-//Author - Jayant Navrange | Source changed
-require('dotenv').config()
-const PORT = process.env.PORT;
+//Author - Jayant Navrange https://github.com/jayantur13
+require("dotenv").config();
+const PORT = process.env.PORT || 8000;
 const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const app = express();
-
-//Some host/os needs below lines to work
-app.set("port", PORT);
-app.use(express.static(__dirname + "/public"));
 
 //Results
 let dc = [];
@@ -18,135 +14,125 @@ let pm = [];
 let ld = [];
 let frr = [];
 
-//Msg
-var type = "not available";
-var info = "-> Attention sometimes you may get outdated data,lookout <-";
+//For user information
+var type = "unvailable";
+var info = "Note: This API doesn't gaurantee latest data by date.";
 
 //Get word of the day from all sources
 app.get("/word/today", (req, resp) => {
-  const s1 = axios
-    .get(process.env.S1)
-    .then(function (response) {
-      const html = response.data;
-      const $ = cheerio.load(html);
+  const s1 = axios.get(process.env.S1).then(function (response) {
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-      const source = "#1";
-      const date = $(".otd-item-headword__date")
-        .children()
-        .first()
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const word = $(".otd-item-headword__word")
-        .children()
-        .first()
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const mean = $(".otd-item-headword__pos-blocks p:nth-child(2)")
-        .first()
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      dc = [];
-      dc.push({ source, date, word, type, mean });
-    });
-  const s2 = axios
-    .get(process.env.S2)
-    .then(function (response) {
-      const html = response.data;
-      const $ = cheerio.load(html);
+    const source = "#1";
+    const date = $(".otd-item-headword__date")
+      .children()
+      .first()
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const word = $(".otd-item-headword__word")
+      .children()
+      .first()
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const mean = $(".otd-item-headword__pos-blocks p:nth-child(2)")
+      .first()
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    dc = [];
+    dc.push({ source, date, word, type, mean });
+  });
+  const s2 = axios.get(process.env.S2).then(function (response) {
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-      const source = "#2";
-      const date = $(".w-a-title").text().split(":")[1].trim();
-      const word = $(".word-and-pronunciation h1")
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const type = $(".word-attributes .main-attr").text().trim();
-      const mean = $(".wod-definition-container p")
-        .text()
-        .replace(/\..*$/, ".")
-        .trim();
-      mw = [];
-      mw.push({ source, date, word, type, mean });
-    });
-  const s3 = axios
-    .get(process.env.S3)
-    .then(function (response) {
-      const html = response.data;
-      const $ = cheerio.load(html);
+    const source = "#2";
+    const date = $(".w-a-title").text().split(":")[1].trim();
+    const word = $(".word-and-pronunciation h1")
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const type = $(".word-attributes .main-attr").text().trim();
+    const mean = $(".wod-definition-container p")
+      .text()
+      .replace(/\..*$/, ".")
+      .trim();
+    mw = [];
+    mw.push({ source, date, word, type, mean });
+  });
+  const s3 = axios.get(process.env.S3).then(function (response) {
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-      const source = "#3";
-      const mmean = $(".border .pt-3").remove().text(); //remove pt-3 selector
-      const mean = $(".border")
-        .children("p")
-        .first()
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const date = $("p")
-        .children("time")
-        .first()
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const word = $(".pt-3")
-        .children("a")
-        .first()
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      cd = [];
-      cd.push({ source, date, word, type, mean });
-    });
-  const s4 = axios
-    .get(process.env.S4)
-    .then((response) => {
-      const html = response.data;
-      const $ = cheerio.load(html);
+    const source = "#3";
+    const mmean = $(".border .pt-3").remove().text(); //remove pt-3 selector
+    const mean = $(".border")
+      .children("p")
+      .first()
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const date = $("p")
+      .children("time")
+      .first()
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const word = $(".pt-3")
+      .children("a")
+      .first()
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    cd = [];
+    cd.push({ source, date, word, type, mean });
+  });
+  const s4 = axios.get(process.env.S4).then((response) => {
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-      const source = "#4";
-      const date = $(".pronounce")
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const word = $(".wotd-left h2")
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const type = $(".wotd-right small").text().toLowerCase().trim();
-      const mean = $(".wotd-right p").text().split(".")[0].trim();
-      pm = [];
-      pm.push({ source, date, word, type, mean });
-    });
-  const s5 = axios
-    .get(process.env.S5)
-    .then((response) => {
-      const html = response.data;
-      const $ = cheerio.load(html);
+    const source = "#4";
+    const date = $(".pronounce")
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const word = $(".wotd-left h2")
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const type = $(".wotd-right small").text().toLowerCase().trim();
+    const mean = $(".wotd-right p").text().split(".")[0].trim();
+    pm = [];
+    pm.push({ source, date, word, type, mean });
+  });
+  const s5 = axios.get(process.env.S5).then((response) => {
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-      const source = "#5";
-      const date = $(".for_date")
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const word = $(".hw_m .hw_txt")
-        .text()
-        .replace(/(\r\n|\n|\r)/gm, "")
-        .trim();
-      const type = $(".hw_d span:nth-child(4)").text().trim();
-      const mean = $(".midbt p").text().trim();
-      ld = [];
-      ld.push({ source, date, word, type, mean });
-    });
+    const source = "#5";
+    const date = $(".for_date")
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const word = $(".hw_m .hw_txt")
+      .text()
+      .replace(/(\r\n|\n|\r)/gm, "")
+      .trim();
+    const type = $(".hw_d span:nth-child(4)").text().trim();
+    const mean = $(".midbt p").text().trim();
+    ld = [];
+    ld.push({ source, date, word, type, mean });
+  });
 
   Promise.allSettled([s1, s2, s3, s4, s5])
     .then((values) => {
       frr = [];
       infomsg = [];
       infomsg.push({ info });
-      frr = [].concat(info, dc, mw, cd, pm, ld);
+      frr = [].concat(infomsg, dc, mw, cd, pm, ld);
       resp.status(200).json(frr);
     })
     .catch((err) => resp.json(err.message));
