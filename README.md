@@ -1,24 +1,30 @@
 # Word-of-the-day
+
 Get word of the day from single or multiple sources
 
 ## Project requirements
+
 Install all the dependencies,type in terminal<br />
 
 `npm i`
 
 ## Running the project
+
 To run the project,type in terminal<br />
 
 `npm start`
 
-## Sponsor
-If this project helped you in any way,you can always sponsor to support me and the project
+## Support
+
+If you are using this project, consider donating. Thanks.
 
 ## Reminder
-Most of the websites have don't want to be scrapped.So, try not to flood the website with many requests and use this only for personal projects 
+
+Most of the websites have don't want to be scrapped.So, try not to flood the website with many requests and use this only for personal projects
 
 ## MIT License
-Permission is hereby granted, free of
+
+````Permission is hereby granted, free of
 charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without
 restriction, including without limitation the rights to use, copy, modify, merge,
@@ -38,5 +44,6 @@ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
 EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+THE SOFTWARE.```
 
+````
